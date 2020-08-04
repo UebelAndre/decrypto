@@ -1,0 +1,9 @@
+# Specify filepatterns you want git to ignore.
+
+pkg/*
+www/node_modules/*
+www/dist/*
+
+#Added by cargo
+
+/target
