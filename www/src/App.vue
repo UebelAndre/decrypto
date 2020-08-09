@@ -8,8 +8,6 @@
 <script>
 import * as wasm from "decrypto-wasm";
 
-console.log("aa", wasm.hello_world());
-
 export default {
   name: "App",
   data() {
