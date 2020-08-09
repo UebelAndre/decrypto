@@ -1,0 +1,27 @@
+{
+    "name": "{name}",
+    "description": "Bazel-generated node module",
+    "scripts": {
+      "build": "bazel build //rust/..."
+    },
+    "repository": {
+      "type": "git",
+      "url": "ssh://git@github.com:UebelAndre/decrypto.git"
+    },
+    "files": [
+      "{bindgen}.wasm",
+      "{bindgen}.js",
+      "{bindgen}.d.ts"  
+    ],
+    "module": "{bindgen}.js",
+    "types": "{bindgen}.d.ts",
+    "sideEffects": false,
+    "keywords": [
+      "rust",
+      "wasm",
+      "webassembly"
+    ],
+    "author": "UebelAndre",
+    "license": "(MIT OR Apache-2.0)",
+    "homepage": "https://github.com/UebelAndre/decrypto"
+}

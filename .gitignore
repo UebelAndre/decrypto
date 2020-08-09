@@ -3,7 +3,13 @@
 pkg/*
 www/node_modules/*
 www/dist/*
+/bazel-bin
+/bazel-out
+/bazel-decrypto
+/bazel-testlogs
 
 #Added by cargo
 
+**/Cargo.lock
 /target
+rust/target

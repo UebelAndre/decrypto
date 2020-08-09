@@ -6,14 +6,15 @@ edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[lib]
-crate-type = ["cdylib", "rlib"]
+[[bin]]
+name = "decrypto_wasm"
+path = "src/main.rs"
 
 [features]
 default = ["console_error_panic_hook"]
 
 [dependencies]
-wasm-bindgen = "0.2.67"
+wasm-bindgen = "=0.2.48"  # Must match the same version used in `rules_rust`
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires
@@ -28,9 +29,35 @@ console_error_panic_hook = { version = "0.1.6", optional = true }
 # Unfortunately, `wee_alloc` requires nightly Rust when targeting wasm for now.
 wee_alloc = { version = "0.4.5", optional = true }
 
-[dev-dependencies]
-wasm-bindgen-test = "0.3.17"
-
 [profile.release]
 # Tell `rustc` to optimize for small code size.
 opt-level = "s"
+
+[raze]
+workspace_path = "//rust/cargo"
+genmode = "Remote"
+output_buildfile_suffix = "BUILD.bazel"
+# The target must match a dependencies section above
+target = "wasm32-unknown-unknown"
+# gen_workspace_prefix = "decrypto_raze"
+incompatible_relative_workspace_path = true
+
+[raze.crates.proc-macro2.'0.4.30']
+additional_flags = [
+    "--cfg=u128",
+    "--cfg=use_proc_macro",
+    "--cfg=wrap_proc_macro",
+]
+
+[raze.crates.unicase.'1.4.2']
+additional_flags = [
+  "--cfg=__unicase__iter_cmp",
+  "--cfg=__unicase__defauler_hasher",
+]
+
+[raze.crates.syn.'0.15.43']
+gen_buildrs = true
+additional_flags = [
+  "--cfg=syn_can_call_macro_by_path",
+  "--cfg=visit",
+]

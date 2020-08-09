@@ -1,0 +1,46 @@
+# load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin", "nodejs_test")
+load("@npm//@vue/cli-service:index.bzl", "vue_cli_service")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "src",
+    srcs = glob(["src/**/**"]),
+)
+
+vue_cli_service(
+    name = "serve",
+    args = [
+        "serve",
+        "www/src/main.js"
+    ],
+    data = [
+        ":package.json",
+        ":src",
+        "//rust:decrypto_wasm",
+        "babel.config.js",
+    ],
+)
+
+vue_cli_service(
+    name = "build",
+    outs = ["dist"],
+    args = [
+        "build",
+        "--dest",
+        "$(@D)/dist",
+        "--skip-plugins",
+        "eslint",
+        "www/src/main.js",
+    ],
+    data = [
+        ":package.json",
+        ":src",
+        "@npm//@vue/cli-plugin-babel",
+        "@npm//vue",
+        # Shouldn't be needed since it's in skip-plugins ?
+        # "@npm//@vue/cli-plugin-eslint",
+        "//rust:decrypto_wasm",
+        "babel.config.js",
+    ],
+)

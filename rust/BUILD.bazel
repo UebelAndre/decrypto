@@ -1,0 +1,34 @@
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+load("@io_bazel_rules_rust//rust:rust.bzl", "rust_binary")
+load("@io_bazel_rules_rust//wasm_bindgen:wasm_bindgen.bzl", "rust_wasm_bindgen")
+
+package(default_visibility = ["//visibility:public"])
+
+# Strangely, `rust_wasm_bindgen` only works with `rust_binary`
+rust_binary(
+    name = "decrypto_lib",
+    srcs = glob(include = ["src/**/*.rs"]),
+    edition = "2018",
+    deps = [
+        "//rust/cargo:console_error_panic_hook",
+        # "//rust/cargo:wasm_bindgen",
+        "@io_bazel_rules_rust//wasm_bindgen/raze:wasm_bindgen",
+    ],
+)
+
+rust_wasm_bindgen(
+    name = "wasm",
+    wasm_file = ":decrypto_lib",
+)
+
+pkg_npm(
+    name = "decrypto_wasm",
+    package_name = "decrypto-wasm",
+    srcs = ["package.json"],
+    replace_with_version = "0.0.1",
+    substitutions = {
+        "{name}": "decrypto-wasm",
+        "{bindgen}": "wasm",
+    },
+    deps = [":wasm"],
+)
