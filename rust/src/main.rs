@@ -1,33 +1,22 @@
-// mod utils;
+mod utils;
+mod hello;
 
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
-// #[cfg(feature = "wee_alloc")]
-// #[global_allocator]
-// static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+#[cfg(feature = "wee_alloc")]
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-// #[wasm_bindgen]
-// extern {
-//     fn alert(s: &str);
-// }
 
-// #[wasm_bindgen]
-// pub fn greet() {
-//     unsafe {
-//         alert("Hello, Decrypto!");
-//     }
-// }
-
+/// Set up the game state. This should always be called before anything else.
 #[wasm_bindgen]
-pub fn hello_world() -> String {
-    "Hello, Decrypto".into()
+pub fn init() {
+    utils::set_panic_hook();
 }
 
-#[wasm_bindgen]
-pub fn times_two(i: i32) -> i32 {
-    i * 2
-}
-
+/**
+ * 'main' is a no-op and intentionally does nothing
+ */
 fn main() { }

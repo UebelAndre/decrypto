@@ -8,18 +8,31 @@ filegroup(
     srcs = glob(["src/**/**"]),
 )
 
+filegroup(
+    name = "static",
+    srcs = glob(["static/**/**"]),
+)
+
+filegroup(
+    name = "configs",
+    srcs = glob(["*.config.js"]),
+)
+
+decrypto_app_contents = [
+    ":configs",
+    ":package.json",
+    ":src",
+    ":static",
+    "//rust:decrypto_wasm",
+]
+
 vue_cli_service(
     name = "serve",
     args = [
         "serve",
         "www/src/main.js"
     ],
-    data = [
-        ":package.json",
-        ":src",
-        "//rust:decrypto_wasm",
-        "babel.config.js",
-    ],
+    data = decrypto_app_contents,
 )
 
 vue_cli_service(
@@ -33,14 +46,10 @@ vue_cli_service(
         "eslint",
         "www/src/main.js",
     ],
-    data = [
-        ":package.json",
-        ":src",
+    data = decrypto_app_contents + [
         "@npm//@vue/cli-plugin-babel",
         "@npm//vue",
         # Shouldn't be needed since it's in skip-plugins ?
         # "@npm//@vue/cli-plugin-eslint",
-        "//rust:decrypto_wasm",
-        "babel.config.js",
     ],
 )

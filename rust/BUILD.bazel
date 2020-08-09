@@ -6,19 +6,23 @@ package(default_visibility = ["//visibility:public"])
 
 # Strangely, `rust_wasm_bindgen` only works with `rust_binary`
 rust_binary(
-    name = "decrypto_lib",
+    name = "decrypto",
     srcs = glob(include = ["src/**/*.rs"]),
     edition = "2018",
     deps = [
         "//rust/cargo:console_error_panic_hook",
-        # "//rust/cargo:wasm_bindgen",
+        # Use the `wasm_bindgen` dependency provided by `rules_rust`
+        # to guarantee more consistent results.
         "@io_bazel_rules_rust//wasm_bindgen/raze:wasm_bindgen",
+    ],
+    crate_features = [
+        "console_error_panic_hook",
     ],
 )
 
 rust_wasm_bindgen(
     name = "wasm",
-    wasm_file = ":decrypto_lib",
+    wasm_file = ":decrypto",
 )
 
 pkg_npm(
