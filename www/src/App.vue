@@ -1,21 +1,21 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
+    <img alt="Vue logo" src="./assets/logo.png" />
     <h1>{{ msg }}</h1>
   </div>
 </template>
 
 <script>
-const getWasm = () => import("decrypto-wasm")
+import * as wasm from "decrypto-wasm";
 
 export default {
-    name: 'App',
-    data() {
-        return {
-            msg: getWasm().then(wasm => wasm.hello_world())
-        };
-    }
-}
+  name: "App",
+  data() {
+    return {
+      msg: wasm.hello_world(),
+    };
+  },
+};
 </script>
 
 <style>
