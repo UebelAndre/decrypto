@@ -4,7 +4,7 @@ Vue.config.productionTip = false;
 
 const renderDOM = document.querySelector("#app");
 
-// Comment remove this if you don't want any loading message
+// Remove this if you don't want any loading message
 // Because sometimes it is too fast and it just flashes, giving a bad experience
 renderDOM.innerHTML = "loading...";
 
