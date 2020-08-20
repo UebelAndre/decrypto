@@ -22,6 +22,7 @@ impl State {
     }
 }
 
+#[macro_export]
 macro_rules! mask {
     ($($shift:expr),* $(,)?) => {
         $((1 << ($shift as u32)))|*
@@ -73,7 +74,7 @@ pub struct Fsm<T> {
 
 impl<T> Fsm<T> 
 where T: Into<u32> + Into<usize> + Copy + StateEnum {
-    fn new(initial_state: T) -> Fsm<T> {
+    pub fn new(initial_state: T) -> Fsm<T> {
         Fsm {
             states: std::iter::repeat_with(|| State {
                 on_enter: None,
@@ -85,14 +86,14 @@ where T: Into<u32> + Into<usize> + Copy + StateEnum {
         }
     }
 
-    fn register_state(&mut self, id: T, mask: u32, cb_on_enter: Option<Box<Callback>>, cb_on_exit: Option<Box<Callback>>) {
+    pub fn register_state(&mut self, id: T, mask: u32, cb_on_enter: Option<Box<Callback>>, cb_on_exit: Option<Box<Callback>>) {
         let index: usize = id.into();
         self.states[index].transition_mask = mask;
         self.states[index].on_enter = cb_on_enter;
         self.states[index].on_exit = cb_on_exit;
     }
 
-    fn trigger(&mut self, new_state: T) -> Result<T> {
+    pub fn trigger(&mut self, new_state: T) -> Result<T> {
 
         match self.current_state {
             Some(current_state) => {
@@ -129,7 +130,7 @@ where T: Into<u32> + Into<usize> + Copy + StateEnum {
         }
     }
 
-    fn update(&mut self) {
+    pub fn update(&mut self) {
 
         // Do nothing if there is no pending state
         if self.pending_state.is_none() {
@@ -158,6 +159,7 @@ where T: Into<u32> + Into<usize> + Copy + StateEnum {
     }
 }
 
+#[macro_export]
 macro_rules! cb {
     ($callback:expr) => {
         Some(Box::new($callback))
