@@ -1,0 +1,23 @@
+[package]
+name = "decrypto_game"
+version = "0.1.0"
+authors = ["Andre Brisco <andre.brisco@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+# These are real dependencies but do not work with `cargo-raze`. Make sure 
+# these are commented out before attempting to re-generate dependencies.
+decrypto_game_derive = { path = "../game_derive" }
+
+[raze]
+workspace_path = "//rust/game/cargo"
+genmode = "Remote"
+output_buildfile_suffix = "BUILD.bazel"
+# The target must match a dependencies section above
+target = "wasm32-unknown-unknown"
+gen_workspace_prefix = "decrypto_game"
+incompatible_relative_workspace_path = true

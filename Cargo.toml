@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "rust/game",
+    "rust/game_derive",
+    "rust/wasm",
+]

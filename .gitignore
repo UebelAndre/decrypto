@@ -10,6 +10,4 @@ www/dist/*
 
 #Added by cargo
 
-**/Cargo.lock
-/target
-rust/target
+**/target

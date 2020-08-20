@@ -1,0 +1,38 @@
+[package]
+name = "decrypto_game_derive"
+version = "0.1.0"
+authors = ["Andre Brisco <andre.brisco@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+path = "src/lib.rs"
+proc-macro = true
+
+[dependencies]
+syn = "1.0.38"
+quote = "1.0.7"
+
+[raze]
+workspace_path = "//rust/game_derive/cargo"
+genmode = "Remote"
+output_buildfile_suffix = "BUILD.bazel"
+# The target must match a dependencies section above
+target = "wasm32-unknown-unknown"
+gen_workspace_prefix = "decrypto_game_derive"
+incompatible_relative_workspace_path = true
+
+[raze.crates.proc-macro2.'1.0.19']
+additional_flags = [
+    "--cfg=u128",
+    "--cfg=use_proc_macro",
+    "--cfg=wrap_proc_macro",
+]
+
+[raze.crates.syn.'1.0.38']
+gen_buildrs = true
+additional_flags = [
+  "--cfg=syn_can_call_macro_by_path",
+  "--cfg=visit",
+]

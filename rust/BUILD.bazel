@@ -1,33 +1,62 @@
 load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
-load("@io_bazel_rules_rust//rust:rust.bzl", "rust_binary")
+load("@io_bazel_rules_rust//rust:rust.bzl", "rust_binary", "rust_library")
 load("@io_bazel_rules_rust//wasm_bindgen:wasm_bindgen.bzl", "rust_wasm_bindgen")
 
 package(default_visibility = ["//visibility:public"])
 
+rust_library(
+    name = "decrypto_game_derive",
+    srcs = glob(include = ["game_derive/src/**/*.rs"]),
+    crate_features = [
+        "proc-macro",
+    ],
+    crate_type = "proc-macro",
+    tags = ["manual"],
+    deps = [
+        "//rust/game_derive/cargo:quote",
+        "//rust/game_derive/cargo:syn",
+    ],
+)
+
+rust_library(
+    name = "decrypto_game",
+    srcs = glob(include = ["game/src/**/*.rs"]),
+    proc_macro_deps = [
+        ":decrypto_game_derive",
+    ],
+    tags = ["manual"],
+)
+
 # Strangely, `rust_wasm_bindgen` only works with `rust_binary`
 rust_binary(
-    name = "decrypto",
-    srcs = glob(include = ["src/**/*.rs"]),
+    name = "decrypto_wasm",
+    srcs = glob(include = ["wasm/src/**/*.rs"]),
+    crate_features = [
+        "console_error_panic_hook",
+    ],
     edition = "2018",
+    proc_macro_deps = [
+        ":decrypto_game_derive",
+    ],
     deps = [
-        "//rust/cargo:console_error_panic_hook",
+        ":decrypto_game",
+        "//rust/wasm/cargo:console_error_panic_hook",
         # Use the `wasm_bindgen` dependency provided by `rules_rust`
         # to guarantee more consistent results.
         "@io_bazel_rules_rust//wasm_bindgen/raze:wasm_bindgen",
-    ],
-    crate_features = [
-        "console_error_panic_hook",
     ],
 )
 
 rust_wasm_bindgen(
     name = "wasm",
-    wasm_file = ":decrypto",
+    wasm_file = ":decrypto_wasm",
 )
 
 pkg_npm(
-    name = "decrypto_wasm",
+    name = "decrypto_npm",
     package_name = "decrypto-wasm",
+    # Note, the 'package.json' file must live in
+    # the same directory as this target.
     srcs = ["package.json"],
     replace_with_version = "0.0.1",
     substitutions = {

@@ -10,29 +10,30 @@ workspace(
     managed_directories = {"@npm": ["www/node_modules"]},
 )
 
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-git_repository(
+http_archive(
     name = "bazel_skylib",
-    commit = "2a44ef8ec8c419abd49852b873209de3ab742af7",
-    remote = "https://github.com/bazelbuild/bazel-skylib.git",
-    shallow_since = "1595379092 +0800",
+    sha256 = "97e70364e9249702246c0e9444bccdc4b847bed1eb03c5a3ece4f83dfe6abc44",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.0.2/bazel-skylib-1.0.2.tar.gz",
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.0.2/bazel-skylib-1.0.2.tar.gz",
+    ],
 )
 
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
 bazel_skylib_workspace()
 
-git_repository(
+http_archive(
     name = "io_bazel_rules_rust",
-    commit = "09ec54ca17c3b91dff256c520f1724fd9c329cab",
-    remote = "https://github.com/bazelbuild/rules_rust.git",
-    shallow_since = "1595437342 +0200",
+    sha256 = "5ed804fcd10a506a5b8e9e59bc6b3b7f43bc30c87ce4670e6f78df43604894fd",
+    strip_prefix = "rules_rust-fdf9655ba95616e0314b4e0ebab40bb0c5fe005c",
+    urls = [
+        # Master branch as of 2020-07-27
+        "https://github.com/bazelbuild/rules_rust/archive/fdf9655ba95616e0314b4e0ebab40bb0c5fe005c.tar.gz",
+    ],
 )
-
-load("@io_bazel_rules_rust//:workspace.bzl", "bazel_version")
-
-bazel_version(name = "bazel_version")
 
 load("@io_bazel_rules_rust//rust:repositories.bzl", "rust_repositories")
 
@@ -40,6 +41,10 @@ rust_repositories(
     edition = "2018",
     version = "1.44.1",
 )
+
+load("@io_bazel_rules_rust//:workspace.bzl", "bazel_version")
+
+bazel_version(name = "bazel_version")
 
 load("@io_bazel_rules_rust//bindgen:repositories.bzl", "rust_bindgen_repositories")
 
@@ -51,8 +56,6 @@ rust_wasm_bindgen_repositories()
 
 # Install the nodejs "bootstrap" package
 # This provides the basic tools for running and packaging nodejs programs in Bazel
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
 http_archive(
     name = "build_bazel_rules_nodejs",
     sha256 = "0f2de53628e848c1691e5729b515022f5a77369c76a09fbe55611e12731c90e3",
@@ -72,6 +75,14 @@ npm_install(
     package_lock_json = "//www:package-lock.json",
 )
 
-load("//rust/cargo:crates.bzl", rust_raze = "raze_fetch_remote_crates")
+load("//rust/game/cargo:crates.bzl", "decrypto_game_fetch_remote_crates")
 
-rust_raze()
+decrypto_game_fetch_remote_crates()
+
+load("//rust/game_derive/cargo:crates.bzl", "decrypto_game_derive_fetch_remote_crates")
+
+decrypto_game_derive_fetch_remote_crates()
+
+load("//rust/wasm/cargo:crates.bzl", decrypto_wasm_fetch_remote_crates = "raze_fetch_remote_crates")
+
+decrypto_wasm_fetch_remote_crates()

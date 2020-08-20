@@ -1,0 +1,21 @@
+"""
+@generated
+cargo-raze workspace build file.
+
+DO NOT EDIT! Replaced on runs of cargo-raze
+"""
+package(default_visibility = ["//visibility:public"])
+
+licenses([
+  "notice" # See individual crates for specific licenses
+])
+alias(
+    name = "quote",
+    actual = "@decrypto_game_derive__quote__1_0_7//:quote",
+    tags = ["cargo-raze"],
+)
+alias(
+    name = "syn",
+    actual = "@decrypto_game_derive__syn__1_0_38//:syn",
+    tags = ["cargo-raze"],
+)

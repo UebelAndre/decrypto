@@ -23,7 +23,7 @@ decrypto_app_contents = [
     ":package.json",
     ":src",
     ":static",
-    "//rust:decrypto_wasm",
+    "//rust:decrypto_npm",
 ]
 
 vue_cli_service(
