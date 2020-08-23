@@ -12,6 +12,7 @@ type Callback = dyn FnMut() -> ();
 
 pub struct State {
     on_enter: Option<Box<Callback>>,
+    on_update: Option<Box<Callback>>,
     on_exit: Option<Box<Callback>>,
     transition_mask: u32,
 }
@@ -78,6 +79,7 @@ where T: Into<u32> + Into<usize> + Copy + StateEnum {
         Fsm {
             states: std::iter::repeat_with(|| State {
                 on_enter: None,
+                on_update: None,
                 on_exit: None,
                 transition_mask: 0,
             }).take(T::count()).collect(),
@@ -86,10 +88,15 @@ where T: Into<u32> + Into<usize> + Copy + StateEnum {
         }
     }
 
-    pub fn register_state(&mut self, id: T, mask: u32, cb_on_enter: Option<Box<Callback>>, cb_on_exit: Option<Box<Callback>>) {
+    pub fn get_current_state(&self) -> Option<T> {
+        self.current_state
+    }
+
+    pub fn register_state(&mut self, id: T, mask: u32, cb_on_enter: Option<Box<Callback>>, cb_on_update: Option<Box<Callback>>, cb_on_exit: Option<Box<Callback>>) {
         let index: usize = id.into();
         self.states[index].transition_mask = mask;
         self.states[index].on_enter = cb_on_enter;
+        self.states[index].on_update = cb_on_update;
         self.states[index].on_exit = cb_on_exit;
     }
 
@@ -132,29 +139,35 @@ where T: Into<u32> + Into<usize> + Copy + StateEnum {
 
     pub fn update(&mut self) {
 
-        // Do nothing if there is no pending state
+        // If there's no pending state, update the current state, otherwise, the transition is the 'update' action
         if self.pending_state.is_none() {
-            return;
-        }
-
-        // Update the states first, in case one of the callbacks triggers a new state
-        let old_current_state = self.current_state;
-        let old_pending_state = self.pending_state;
-        self.current_state = self.pending_state;
-        self.pending_state = None;
-
-        // If this is the first update tick of the FSM, there may be no current state
-        if let Some(current_state) = old_current_state {
-            let current_state_index: usize = current_state.into();
-            if let Some(callback) = self.states[current_state_index].on_exit.as_mut() {
-                callback();
+            if let Some(current_state) = self.current_state {
+                let current_state_index: usize = current_state.into();
+                if let Some(callback) = self.states[current_state_index].on_update.as_mut() {
+                    callback();
+                }
             }
         }
+        else {
+            // Update the states first, in case one of the callbacks triggers a new state
+            let old_current_state = self.current_state;
+            let old_pending_state = self.pending_state;
+            self.current_state = self.pending_state;
+            self.pending_state = None;
 
-        // self.pending_state should be guaranteed valid at this point
-        let new_state_index: usize = old_pending_state.unwrap().into();
-        if let Some(callback) = self.states[new_state_index].on_enter.as_mut() {
-            callback();
+            // If this is the first update tick of the FSM, there may be no current state
+            if let Some(current_state) = old_current_state {
+                let current_state_index: usize = current_state.into();
+                if let Some(callback) = self.states[current_state_index].on_exit.as_mut() {
+                    callback();
+                }
+            }
+
+            // self.pending_state should be guaranteed valid at this point
+            let new_state_index: usize = old_pending_state.unwrap().into();
+            if let Some(callback) = self.states[new_state_index].on_enter.as_mut() {
+                callback();
+            }
         }
     }
 }
@@ -200,7 +213,7 @@ mod tests {
         fsm.register_state(
             TestState::Zero, 
             mask!(TestState::One),
-            None, None,
+            None, None, None,
         );
 
         let result = fsm.trigger(TestState::Two);
@@ -237,11 +250,18 @@ mod tests {
             mask!(TestState::One),
             cb!(state_zero_callback.clone()),
             cb!(state_zero_callback.clone()),
+            cb!(state_zero_callback.clone()),
         );
         fsm.register_state(
             TestState::One, 
             mask!(TestState::Two), 
             None,
+            cb!({
+                let counter_one = Rc::clone(&counter_one);
+                move || {
+                    *counter_one.borrow_mut() += 1;
+                }
+            }),
             cb!({
                 let counter_one = Rc::clone(&counter_one);
                 move || {
@@ -254,8 +274,10 @@ mod tests {
             mask!(TestState::Zero), 
             None,
             None,
+            None,
         );
 
+        // Base state
         assert!(fsm.current_state.is_none());
         assert_eq!(fsm.pending_state.unwrap(), TestState::Zero);
         assert_eq!(*counter_zero.borrow(), 0);
@@ -263,30 +285,42 @@ mod tests {
         
         fsm.update();
 
+        // Should reflect zero.on_enter
         assert_eq!(fsm.current_state.unwrap(), TestState::Zero);
         assert!(fsm.pending_state.is_none());
         assert_eq!(*counter_zero.borrow(), 1);
         assert_eq!(*counter_one.borrow(), 0);
 
+        fsm.update();
+
+        // Should reflect zero.update
+        assert_eq!(fsm.current_state.unwrap(), TestState::Zero);
+        assert!(fsm.pending_state.is_none());
+        assert_eq!(*counter_zero.borrow(), 2);
+        assert_eq!(*counter_one.borrow(), 0);
+
         fsm.trigger(TestState::One).unwrap();
         fsm.update();
 
+        // Should reflect zero.on_exit
         assert_eq!(fsm.current_state.unwrap(), TestState::One);
-        assert_eq!(*counter_zero.borrow(), 2);
+        assert_eq!(*counter_zero.borrow(), 3);
         assert_eq!(*counter_one.borrow(), 0);
 
         fsm.trigger(TestState::Two).unwrap();
         fsm.update();
 
+        // Should reflect one.on_exit
         assert_eq!(fsm.current_state.unwrap(), TestState::Two);
-        assert_eq!(*counter_zero.borrow(), 2);
+        assert_eq!(*counter_zero.borrow(), 3);
         assert_eq!(*counter_one.borrow(), 1);
 
         fsm.trigger(TestState::Zero).unwrap();
         fsm.update();
 
+        // Should reflect zero.on_enter
         assert_eq!(fsm.current_state.unwrap(), TestState::Zero);
-        assert_eq!(*counter_zero.borrow(), 3);
+        assert_eq!(*counter_zero.borrow(), 4);
         assert_eq!(*counter_one.borrow(), 1);
     }
 }
