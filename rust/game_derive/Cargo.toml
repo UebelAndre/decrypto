@@ -11,7 +11,7 @@ path = "src/lib.rs"
 proc-macro = true
 
 [dependencies]
-syn = "1.0.38"
+syn = "1.0.40"
 quote = "1.0.7"
 
 [raze]
@@ -23,16 +23,8 @@ target = "wasm32-unknown-unknown"
 gen_workspace_prefix = "decrypto_game_derive"
 incompatible_relative_workspace_path = true
 
-[raze.crates.proc-macro2.'1.0.19']
-additional_flags = [
-    "--cfg=u128",
-    "--cfg=use_proc_macro",
-    "--cfg=wrap_proc_macro",
-]
-
-[raze.crates.syn.'1.0.38']
+[raze.crates.proc-macro2.'1.0.20']
 gen_buildrs = true
-additional_flags = [
-  "--cfg=syn_can_call_macro_by_path",
-  "--cfg=visit",
-]
+
+[raze.crates.syn.'1.0.40']
+gen_buildrs = true

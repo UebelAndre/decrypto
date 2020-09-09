@@ -26,14 +26,14 @@ licenses([
 ])
 
 # Generated targets
-# Unsupported target "alloc_with" with type "test" omitted
-# Unsupported target "benches" with type "bench" omitted
 
 # buildifier: leave-alone
 rust_library(
-    name = "bumpalo",
+    name = "rand_chacha",
     crate_type = "lib",
     deps = [
+        "@raze__ppv_lite86__0_2_9//:ppv_lite86",
+        "@raze__rand_core__0_5_1//:rand_core",
     ],
     srcs = glob(["**/*.rs"]),
     crate_root = "src/lib.rs",
@@ -41,19 +41,12 @@ rust_library(
     rustc_flags = [
         "--cap-lints=allow",
     ],
-    version = "2.6.0",
+    version = "0.2.2",
     tags = [
         "cargo-raze",
         "manual",
     ],
     crate_features = [
-        "collections",
-        "default",
         "std",
     ],
 )
-# Unsupported target "quickchecks" with type "test" omitted
-# Unsupported target "readme_up_to_date" with type "test" omitted
-# Unsupported target "string" with type "test" omitted
-# Unsupported target "tests" with type "test" omitted
-# Unsupported target "vec" with type "test" omitted

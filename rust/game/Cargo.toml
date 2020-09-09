@@ -9,9 +9,12 @@ edition = "2018"
 path = "src/lib.rs"
 
 [dependencies]
+rand = "0.7.3"
+
 # These are real dependencies but do not work with `cargo-raze`. Make sure 
 # these are commented out before attempting to re-generate dependencies.
 decrypto_game_derive = { path = "../game_derive" }
+
 
 [raze]
 workspace_path = "//rust/game/cargo"

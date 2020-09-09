@@ -9,3 +9,8 @@ package(default_visibility = ["//visibility:public"])
 licenses([
   "notice" # See individual crates for specific licenses
 ])
+alias(
+    name = "rand",
+    actual = "@decrypto_game__rand__0_7_3//:rand",
+    tags = ["cargo-raze"],
+)

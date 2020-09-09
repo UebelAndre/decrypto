@@ -4,32 +4,75 @@ cargo-raze crate build file.
 
 DO NOT EDIT! Replaced on runs of cargo-raze
 """
-package(default_visibility = [
-  # Public for visibility by "@raze__crate__version//" targets.
-  #
-  # Prefer access through "//rust/wasm/cargo", which limits external
-  # visibility to explicit Cargo.toml dependencies.
-  "//visibility:public",
-])
 
-licenses([
-  "notice", # MIT from expression "MIT OR Apache-2.0"
-])
-
+# buildifier: disable=load
 load(
     "@io_bazel_rules_rust//rust:rust.bzl",
-    "rust_library",
     "rust_binary",
+    "rust_library",
     "rust_test",
 )
 
+package(default_visibility = [
+    # Public for visibility by "@raze__crate__version//" targets.
+    #
+    # Prefer access through "//rust/wasm/cargo", which limits external
+    # visibility to explicit Cargo.toml dependencies.
+    "//visibility:public",
+])
 
-# Unsupported target "build-script-build" with type "custom-build" omitted
+licenses([
+    "notice",  # MIT from expression "MIT OR Apache-2.0"
+])
 
+# Generated targets
+# buildifier: disable=load-on-top
+load(
+    "@io_bazel_rules_rust//cargo:cargo_build_script.bzl",
+    "cargo_build_script",
+)
+
+# buildifier: leave-alone
+cargo_build_script(
+    name = "syn_build_script",
+    srcs = glob(["**/*.rs"]),
+    crate_root = "build.rs",
+    edition = "2015",
+    # buildifier: leave-alone
+    deps = [
+    ],
+    rustc_flags = [
+        "--cap-lints=allow",
+    ],
+    crate_features = [
+      "clone-impls",
+      "default",
+      "derive",
+      "full",
+      "parsing",
+      "printing",
+      "proc-macro",
+      "quote",
+      "visit",
+    ],
+    build_script_env = {
+    },
+    data = glob(["**"]),
+    tags = [
+        "cargo-raze",
+        "manual",
+    ],
+    version = "0.15.44",
+    visibility = ["//visibility:private"],
+)
+
+
+# buildifier: leave-alone
 rust_library(
     name = "syn",
     crate_type = "lib",
     deps = [
+        ":syn_build_script",
         "@raze__proc_macro2__0_4_30//:proc_macro2",
         "@raze__quote__0_6_13//:quote",
         "@raze__unicode_xid__0_1_0//:unicode_xid",
@@ -41,7 +84,10 @@ rust_library(
         "--cap-lints=allow",
     ],
     version = "0.15.44",
-    tags = ["cargo-raze"],
+    tags = [
+        "cargo-raze",
+        "manual",
+    ],
     crate_features = [
         "clone-impls",
         "default",
@@ -54,7 +100,6 @@ rust_library(
         "visit",
     ],
 )
-
 # Unsupported target "test_asyncness" with type "test" omitted
 # Unsupported target "test_attribute" with type "test" omitted
 # Unsupported target "test_derive_input" with type "test" omitted

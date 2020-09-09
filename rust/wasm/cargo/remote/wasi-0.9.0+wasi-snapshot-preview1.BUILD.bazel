@@ -22,16 +22,14 @@ package(default_visibility = [
 ])
 
 licenses([
-    "notice",  # MIT from expression "MIT OR Apache-2.0"
+    "notice",  # Apache-2.0 from expression "Apache-2.0 OR (Apache-2.0 OR MIT)"
 ])
 
 # Generated targets
-# Unsupported target "alloc_with" with type "test" omitted
-# Unsupported target "benches" with type "bench" omitted
 
 # buildifier: leave-alone
 rust_library(
-    name = "bumpalo",
+    name = "wasi",
     crate_type = "lib",
     deps = [
     ],
@@ -41,19 +39,13 @@ rust_library(
     rustc_flags = [
         "--cap-lints=allow",
     ],
-    version = "2.6.0",
+    version = "0.9.0+wasi-snapshot-preview1",
     tags = [
         "cargo-raze",
         "manual",
     ],
     crate_features = [
-        "collections",
         "default",
         "std",
     ],
 )
-# Unsupported target "quickchecks" with type "test" omitted
-# Unsupported target "readme_up_to_date" with type "test" omitted
-# Unsupported target "string" with type "test" omitted
-# Unsupported target "tests" with type "test" omitted
-# Unsupported target "vec" with type "test" omitted

@@ -6,13 +6,21 @@ use decrypto_game::{
 
 use super::decrypto::{
     state,
+    game,
+    words::WordList,
 };
 
 use wasm_bindgen::prelude::*;
 
+use std::{
+    rc::Rc,
+    cell::RefCell,
+};
+
 #[wasm_bindgen]
 pub struct App {
     fsm: Fsm<state::AppState>,
+    game: Rc<RefCell<Option<game::Game>>>,
 }
 
 #[wasm_bindgen]
@@ -23,25 +31,38 @@ impl App {
 
         let mut app = App {
             fsm: Fsm::new(state::AppState::PRE),
+            game: Rc::new(RefCell::new(None)),
         };
 
         app.fsm.register_state(
             state::AppState::PRE, 
             mask!(state::AppState::GAME), 
-            cb!(|| {
-                
-            }), 
-            cb!(|| {
-
+            cb!({
+                let game = Rc::clone(&app.game);
+                move || {
+                    let mut game = game.borrow_mut();
+                    *game = Some(game::Game::new());
+                }
             }),
-            cb!(|| {
-
+            cb!({
+                let game = Rc::clone(&app.game);
+                move || {
+                    let mut game = game.borrow_mut();
+                    game.as_mut().unwrap().update();
+                }
+            }),
+            cb!({
+                let game = Rc::clone(&app.game);
+                move || {
+                    let mut game = game.borrow_mut();
+                    *game = None;
+                }
             }),
         );
 
         app.fsm.register_state(
             state::AppState::GAME, 
-            mask!(state::AppState::PRE, state::AppState::END), 
+            mask!(state::AppState::END), 
             cb!(|| {
                 
             }), 

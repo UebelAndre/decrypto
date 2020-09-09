@@ -4,18 +4,28 @@ cargo-raze workspace build file.
 
 DO NOT EDIT! Replaced on runs of cargo-raze
 """
+
 package(default_visibility = ["//visibility:public"])
 
 licenses([
-  "notice" # See individual crates for specific licenses
+    "notice",  # See individual crates for specific licenses
 ])
+
+# Aliased targets
 alias(
     name = "quote",
     actual = "@decrypto_game_derive__quote__1_0_7//:quote",
-    tags = ["cargo-raze"],
+    tags = [
+        "cargo-raze",
+        "manual",
+    ],
 )
+
 alias(
     name = "syn",
-    actual = "@decrypto_game_derive__syn__1_0_38//:syn",
-    tags = ["cargo-raze"],
+    actual = "@decrypto_game_derive__syn__1_0_40//:syn",
+    tags = [
+        "cargo-raze",
+        "manual",
+    ],
 )

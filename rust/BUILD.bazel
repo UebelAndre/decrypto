@@ -41,6 +41,7 @@ rust_binary(
     deps = [
         ":decrypto_game",
         "//rust/wasm/cargo:console_error_panic_hook",
+        "//rust/wasm/cargo:rand",
         # Use the `wasm_bindgen` dependency provided by `rules_rust`
         # to guarantee more consistent results.
         "@io_bazel_rules_rust//wasm_bindgen/raze:wasm_bindgen",
